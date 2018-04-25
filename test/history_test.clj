@@ -38,12 +38,12 @@
            (-> (create-history 10)
                fwd))))
 
-  (testing "test back with one entries"
+  (testing "test forward with one entries"
     (is (= {:max-count 10, :index 0, :entries ["http://www.google.com"]}
            (-> (new-history 10 0 ["http://www.google.com"])
-               back))))
+               fwd))))
 
-  (testing "test back with two entries"
+  (testing "test forward with two entries"
     (is (= {:max-count 10, :index 1, :entries ["http://www.google.com"
                                                "http://www.yahoo.com"]}
            (-> (new-history 10 0 ["http://www.google.com"
