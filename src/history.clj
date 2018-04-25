@@ -55,7 +55,7 @@
   {:post [(valid-history? %)]}
   (when (not (empty? entries))
     (assert (<= 0 current-index (max-index entries))
-            (format "Invalid data: current-index %d, max index %d, entries count %s"
+            (format "Invalid data: current idx %d, max idx %d, entries count %s"
                     current-index (max-index entries) (count entries))))
   (assert (<= (count entries) max-count)
           (format "Count entries %d exceeded max-count %d"
@@ -74,22 +74,13 @@
   {:pre [(valid-history? history)
          (not (string/blank? url))]}
   (let [max-count (:max-count history)
-        truncated (if (empty-history? history)
-                    []
-                    (-> history
-                        :index
-                        (+ 1)
-                        (take (:entries history))))
-        entries (->> url
-                     (conj (into [] truncated))
-                     (take-last max-count))
+        truncated (when-not (empty-history? history)
+                    (-> history :index (+ 1) (take (:entries history))))
+        entries (->> url (conj (into [] truncated)) (take-last max-count))
         next-index (if (empty-history? history)
                      0
-                     (min (max-index entries)
-                          (+ (:index history) 1)))]
-    (new-history max-count
-                 next-index
-                 entries)))
+                     (min (max-index entries) (+ (:index history) 1)))]
+    (new-history max-count next-index entries)))
 
 ; to support “go back” on the browser
 (defn back [history]
