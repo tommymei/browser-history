@@ -105,7 +105,4 @@
 
 ; Bonus: look up matching URLs by substring
 (defn lookup [history s]
-  (->> history
-       :entries
-       (filter #(substring? % s))
-       seq))
+  (->> history :entries (filter #(substring? % s)) seq))
