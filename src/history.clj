@@ -10,7 +10,7 @@
 
 ; creates the history object - use a class, record, or other structure if you want!
 
-; stores at most `max-count` URLs in the history
+; stores at most `max` URLs in the history
 
 (defn not-negative? [n]
   (not (neg? n)))
@@ -19,7 +19,7 @@
 (s/defschema PosInt (s/constrained s/Int pos? "positive"))
 
 (s/defschema History
-  {:max-count PosInt
+  {:max PosInt
    :index (s/maybe NonNegInt)
    :entries (s/maybe [s/Str])})
 
@@ -33,7 +33,7 @@
 (defn- max-index
   "Calculates max index on an array."
   [coll]
-  (some-> coll not-empty count (- 1)))
+  (some-> coll not-empty count dec))
 
 (defn- empty-history? [history]
   (-> history :entries empty?))
@@ -51,54 +51,50 @@
        (= (-> history :entries max-index)
           (:index history))))
 
-(defn new-history [max-count current-index entries]
+(defn new-history [max current-index entries]
   {:post [(valid-history? %)]}
   (when (not (empty? entries))
     (assert (<= 0 current-index (max-index entries))
             (format "Invalid data: current idx %d, max idx %d, entries count %s"
                     current-index (max-index entries) (count entries))))
-  (assert (<= (count entries) max-count)
-          (format "Count entries %d exceeded max-count %d"
+  (assert (<= (count entries) max)
+          (format "Count entries %d exceeded max %d"
                   (count entries)
-                  max-count))
-  {:max-count max-count
+                  max))
+  {:max max
    :index current-index
    :entries entries})
 
 
-(defn create-history [max-count]
-  (new-history max-count nil nil))
+(defn create-history [max]
+  (new-history max nil nil))
 
 ; to support “click a link” on the browser
 (defn visit [history url]
   {:pre [(valid-history? history)
          (not (string/blank? url))]}
-  (let [max-count (:max-count history)
+  (let [max (:max history)
         truncated (when-not (empty-history? history)
-                    (-> history :index (+ 1) (take (:entries history))))
-        entries (->> url (conj (into [] truncated)) (take-last max-count))
+                    (-> history :index inc (take (:entries history))))
+        entries (->> url (conj (into [] truncated)) (take-last max))
         next-index (if (empty-history? history)
                      0
-                     (min (max-index entries) (+ (:index history) 1)))]
-    (new-history max-count next-index entries)))
+                     (min (max-index entries) (inc (:index history))))]
+    (new-history max next-index entries)))
 
 ; to support “go back” on the browser
 (defn back [history]
   (if (or (empty-history? history)
           (at-start? history))
     history
-    (new-history (:max-count history)
-                 (- (:index history) 1)
-                 (:entries history))))
+    (new-history (:max history) (dec (:index history)) (:entries history))))
 
 ; to support; to support “go forward” on the browser
 (defn fwd [history]
   (if (or (empty-history? history)
           (at-end? history))
     history
-    (new-history (:max-count history)
-                 (+ (:index history) 1)
-                 (:entries history))))
+    (new-history (:max history) (inc (:index history)) (:entries history))))
 
 (defn substring? [s sub]
   (not= -1 (.indexOf s sub)))

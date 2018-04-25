@@ -10,23 +10,23 @@
     (is (thrown? AssertionError (create-history -1))))
 
   (testing "test create history : positive"
-    (is (= {:max-count 10, :index nil, :entries nil}
+    (is (= {:max 10, :index nil, :entries nil}
            (create-history 10)))))
 
 
 (deftest back-test
   (testing "test back with no entries"
-    (is (= {:max-count 10, :index nil, :entries nil}
+    (is (= {:max 10, :index nil, :entries nil}
            (-> (create-history 10)
                back))))
 
   (testing "test back with one entries"
-    (is (= {:max-count 10, :index 0, :entries ["http://www.google.com"]}
+    (is (= {:max 10, :index 0, :entries ["http://www.google.com"]}
            (-> (new-history 10 0 ["http://www.google.com"])
                back))))
 
   (testing "test back with two entries"
-    (is (= {:max-count 10, :index 0, :entries ["http://www.google.com"
+    (is (= {:max 10, :index 0, :entries ["http://www.google.com"
                                                "http://www.yahoo.com"]}
            (-> (new-history 10 1 ["http://www.google.com"
                                   "http://www.yahoo.com"])
@@ -34,17 +34,17 @@
 
 (deftest fwd-test
   (testing "Test forward with no entries"
-    (is (= {:max-count 10, :index nil, :entries nil}
+    (is (= {:max 10, :index nil, :entries nil}
            (-> (create-history 10)
                fwd))))
 
   (testing "test forward with one entries"
-    (is (= {:max-count 10, :index 0, :entries ["http://www.google.com"]}
+    (is (= {:max 10, :index 0, :entries ["http://www.google.com"]}
            (-> (new-history 10 0 ["http://www.google.com"])
                fwd))))
 
   (testing "test forward with two entries"
-    (is (= {:max-count 10, :index 1, :entries ["http://www.google.com"
+    (is (= {:max 10, :index 1, :entries ["http://www.google.com"
                                                "http://www.yahoo.com"]}
            (-> (new-history 10 0 ["http://www.google.com"
                                   "http://www.yahoo.com"])
@@ -53,18 +53,18 @@
 
 (deftest visit-test
   (testing "Visit on empty history"
-    (is (= {:max-count 10, :index 0, :entries ["http://www.google.com"]}
+    (is (= {:max 10, :index 0, :entries ["http://www.google.com"]}
            (-> (create-history 10)
                (visit "http://www.google.com")))))
 
   (testing "Visit on one entry history"
-    (is (= {:max-count 10, :index 1, :entries ["http://www.google.com"
+    (is (= {:max 10, :index 1, :entries ["http://www.google.com"
                                                "http://www.yahoo.com"]}
            (-> (new-history 10 0 ["http://www.google.com"])
                (visit "http://www.yahoo.com")))))
 
   (testing "Visit on history where you are at the end of list"
-    (is (= {:max-count 10, :index 2, :entries ["http://www.google.com"
+    (is (= {:max 10, :index 2, :entries ["http://www.google.com"
                                                "http://www.yahoo.com"
                                                "http://www.microsoft.com"]}
            (-> (new-history 10 1 ["http://www.google.com"
@@ -72,21 +72,21 @@
                (visit "http://www.microsoft.com")))))
 
   (testing "Visit on history where you are NOT at end of list"
-    (is (= {:max-count 10, :index 1, :entries ["http://www.google.com"
+    (is (= {:max 10, :index 1, :entries ["http://www.google.com"
                                                "http://www.microsoft.com"]}
            (-> (new-history 10 0 ["http://www.google.com"
                                   "http://www.yahoo.com"])
                (visit "http://www.microsoft.com")))))
 
   (testing "Visit on history where there are max entries and you are at the end of list"
-    (is (= {:max-count 2, :index 1, :entries ["http://www.yahoo.com"
+    (is (= {:max 2, :index 1, :entries ["http://www.yahoo.com"
                                               "http://www.microsoft.com"]}
            (-> (new-history 2 1 ["http://www.google.com"
                                  "http://www.yahoo.com"])
                (visit "http://www.microsoft.com")))))
 
   (testing "Visit on history where there are max entries and you are NOT end of list"
-    (is (= {:max-count 2, :index 1, :entries ["http://www.google.com"
+    (is (= {:max 2, :index 1, :entries ["http://www.google.com"
                                               "http://www.microsoft.com"]}
            (-> (new-history 2 0 ["http://www.google.com"
                                  "http://www.yahoo.com"])
