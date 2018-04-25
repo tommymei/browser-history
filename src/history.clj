@@ -3,8 +3,6 @@
             [clojure.string :as string]
             [clojure.tools.logging :as log]))
 
-; Note: Can do this in python or any other language too!
-
 ; Browser history:
 ; Browser should support URL bar, forward and back buttons
 
@@ -26,6 +24,7 @@
 (defn- valid-history? [history]
   (try
     (s/validate History history)
+    true
     (catch Exception e
       (log/error "data for schema is invalid:" (.getMessage e))
       false)))
