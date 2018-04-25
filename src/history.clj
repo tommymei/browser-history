@@ -84,6 +84,7 @@
 
 ; to support “go back” on the browser
 (defn back [history]
+  {:pre [(valid-history? history)]}
   (if (or (empty-history? history)
           (at-start? history))
     history
@@ -91,6 +92,7 @@
 
 ; to support; to support “go forward” on the browser
 (defn fwd [history]
+  {:pre [(valid-history? history)]}
   (if (or (empty-history? history)
           (at-end? history))
     history
@@ -101,4 +103,6 @@
 
 ; Bonus: look up matching URLs by substring
 (defn lookup [history s]
+  {:pre [(valid-history? history)
+         (not (string/blank? s))]}
   (->> history :entries (filter #(substring? % s)) seq))
