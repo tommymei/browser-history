@@ -33,17 +33,21 @@
 (defn- max-index
   "Calculates max index on an array."
   [coll]
-  (- (count coll) 1))
+  (some-> coll not-empty count (- 1)))
 
 (defn- empty-history? [history]
   (-> history :entries empty?))
 
-(defn- at-start? [history]
-  (and (:index history)
+(defn- at-start?
+  "Pred to indicate whether currently at the start of a non-empty history"
+  [history]
+  (and (not (empty-history? history))
        (= 0 (:index history))))
 
-(defn- at-end? [history]
-  (and (:index history)
+(defn- at-end?
+  "Pred to indicate whether currently at the start of a non-empty history"
+  [history]
+  (and (not (empty-history? history))
        (= (-> history :entries max-index)
           (:index history))))
 
